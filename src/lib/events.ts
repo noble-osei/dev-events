@@ -41,15 +41,21 @@ export async function getEventSlugs(): Promise<string[]> {
  * Cached so the result becomes part of the prerendered page instead of request-time data.
  * Invalidated on demand via the "events" tag, with an hourly refresh as a safety net.
  */
-export async function getEventBySlug(slug: string): Promise<IEvent | null> {
+export async function getEventBySlug(slug: string): Promise<(IEvent & { id: string }) | null> {
   "use cache";
   cacheLife("hours");
   cacheTag(EVENTS_CACHE_TAG);
 
   await connectToDatabase();
 
-  // Drop _id (an ObjectId class instance) so the result is serializable for the cache.
-  return Event.findOne({ slug }).select("-_id -__v").lean<IEvent>().exec();
+  const event = await Event.findOne({ slug }).select("-__v").lean<IEvent & { _id: unknown }>().exec();
+
+  if (!event) return null;
+
+  // _id is an ObjectId class instance, which isn't serializable for the cache; expose it as a string id.
+  const { _id, ...rest } = event;
+
+  return { ...rest, id: String(_id) };
 }
 
 export async function getSimilarEventsBySlug(slug: string): Promise<IEvent[]> {

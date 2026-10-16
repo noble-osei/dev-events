@@ -1,7 +1,11 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { getEventBySlug, getEventSlugs, getSimilarEventsBySlug } from "@/lib/events";
+import {
+  getEventBySlug,
+  getEventSlugs,
+  getSimilarEventsBySlug,
+} from "@/lib/events";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
 import { IEvent } from "@/database/index";
@@ -43,10 +47,12 @@ const EventAgenda = ({ agendaItems }: { agendaItems: string[] }) => (
 const EventTags = ({ tags }: { tags: string[] }) => (
   <div className="flex flex-row gap-1.5 flex-wrap">
     {tags.map((tag) => (
-      <div className="pill" key={tag}>{tag}</div>
+      <div className="pill" key={tag}>
+        {tag}
+      </div>
     ))}
   </div>
-)
+);
 
 const EventDetails = async ({
   params,
@@ -70,7 +76,7 @@ const EventDetails = async ({
       </div>
 
       <div className="details">
-      {/* Left Side = Event Content */}
+        {/* Left Side = Event Content */}
         <div className="content">
           <Image
             src={event.image}
@@ -125,7 +131,7 @@ const EventDetails = async ({
           <EventTags tags={event.tags} />
         </div>
 
-      {/* Right Side = Booking Form */}
+        {/* Right Side = Booking Form */}
         <aside className="booking">
           <div className="signup-card">
             <h2>Book Your Spot</h2>
@@ -137,7 +143,7 @@ const EventDetails = async ({
               <p className="text-sm">Be the first to book your spot</p>
             )}
 
-            <BookEvent />
+            <BookEvent eventId={event.id} slug={event.slug} />
           </div>
         </aside>
       </div>
@@ -145,9 +151,10 @@ const EventDetails = async ({
       <div className="flex w-full flex-col gap-4 pt-20">
         <h2>Similar Events</h2>
         <div className="events">
-          {similarEvents.length > 0 && similarEvents.map((similarEvent: IEvent) => (
-            <EventCard {...similarEvent} key={similarEvent.slug} />
-          ))}
+          {similarEvents.length > 0 &&
+            similarEvents.map((similarEvent: IEvent) => (
+              <EventCard {...similarEvent} key={similarEvent.slug} />
+            ))}
         </div>
       </div>
     </section>
